@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#172c45">
+<title>My Digital Legacy</title>
+<style>
+:root{--navy:#172c45;--teal:#167d70;--bg:#f4f7fb;--ink:#182536;--muted:#657487;--line:#dce4ed;--white:#fff;--warn:#fff4db;--red:#a33b35}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans Bengali",sans-serif}
+header{background:var(--navy);color:white;padding:22px max(18px,calc((100% - 1050px)/2));}
+.brand{display:flex;align-items:center;gap:12px;font-weight:750;letter-spacing:.2px}.brand-icon{width:42px;height:42px;border-radius:13px;background:#24506a;display:grid;place-items:center;font-size:23px}
+header h1{font-size:clamp(23px,4vw,34px);margin:20px 0 5px}header p{color:#d3dfeb;margin:0}
+main{max-width:1050px;margin:22px auto;padding:0 16px 50px}.notice{background:var(--warn);border:1px solid #efd89e;padding:13px 15px;border-radius:12px;margin-bottom:18px;font-size:14px;line-height:1.55}
+.panel,.card{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 3px 12px #1c35500a}
+.auth{max-width:460px;margin:35px auto}.auth h2,.section-title{margin:0 0 14px;font-size:21px}
+label{display:block;font-weight:650;font-size:14px;margin:12px 0 6px}
+input,textarea,select{width:100%;padding:12px;border:1px solid #cbd6e2;border-radius:10px;font:inherit;background:#fff;color:var(--ink)}
+textarea{min-height:130px;resize:vertical}
+button{border:0;border-radius:10px;padding:11px 15px;background:var(--teal);color:#fff;font:inherit;font-weight:700;cursor:pointer}
+button.secondary{background:#eaf0f5;color:#24374b}button.danger{background:#a33b35}button:disabled{opacity:.5;cursor:not-allowed}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:14px}.muted{color:var(--muted);font-size:13px;line-height:1.55}
+.hidden{display:none!important}.topline{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.wide{grid-column:1/-1}
+.stat{font-size:24px;font-weight:800;color:var(--navy)}.stat-label{font-size:13px;color:var(--muted)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.tabs button{background:#e7edf3;color:#31465b}.tabs button.active{background:var(--navy);color:white}
+.item{border:1px solid var(--line);border-radius:12px;padding:13px;margin:10px 0}.item h3{margin:0 0 5px;font-size:17px}.item p{white-space:pre-wrap;margin:8px 0}.tag{display:inline-block;background:#eaf4f2;color:#17665c;padding:3px 8px;border-radius:20px;font-size:12px}
+hr{border:0;border-top:1px solid var(--line);margin:18px 0}
+footer{max-width:1050px;margin:auto;padding:0 16px 28px;color:var(--muted);font-size:12px}
+@media(max-width:700px){.grid{grid-template-columns:1fr}.wide{grid-column:auto}.panel,.card{padding:15px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="brand-icon">🛡️</div><div>MY DIGITAL LEGACY</div></div>
+  <h1>আপনার স্মৃতি, আপনার নির্দেশনা</h1>
+  <p>ব্যক্তিগত নোট ও ডিজিটাল উত্তরাধিকার ব্যবস্থাপনা</p>
+</header>
+<main>
+  <div class="notice"><b>গুরুত্বপূর্ণ:</b> এটি প্রাথমিক সংস্করণ। Firebase সংযোগ ও নিরাপত্তা Rules ঠিকভাবে সেট না করা পর্যন্ত এখানে আসল গোপন তথ্য রাখবেন না। এই HTML একা স্বয়ংক্রিয় SMS/ইমেইল পাঠাতে বা মৃত্যু নিশ্চিত করতে পারে না।</div>
+
+  <section id="setup" class="panel hidden">
+    <h2>Firebase সংযোগ সেটআপ</h2>
+    <p class="muted">Firebase Console → Project settings → General → Your apps থেকে Web App-এর firebaseConfig কপি করে নিচের ঘরগুলো পূরণ করুন। এই সেটিং এই ব্রাউজারেই থাকবে।</p>
+    <label>API Key</label><input id="cfgApi" autocomplete="off">
+    <label>Auth Domain</label><input id="cfgAuth">
+    <label>Project ID</label><input id="cfgProject">
+    <label>App ID</label><input id="cfgApp">
+    <div class="actions"><button id="saveConfig">সংযোগ সংরক্ষণ</button><button class="secondary" id="closeSetup">বন্ধ</button></div>
+  </section>
+
+  <section id="authPanel" class="panel auth">
+    <h2>আপনার অ্যাকাউন্টে প্রবেশ</h2>
+    <p class="muted">নিজের ইমেইল ও পাসওয়ার্ড দিয়ে প্রবেশ করুন। প্রথমবার হলে অ্যাকাউন্ট তৈরি করুন।</p>
+    <label>ইমেইল</label><input id="email" type="email" autocomplete="username" placeholder="আপনার ইমেইল">
+    <label>পাসওয়ার্ড</label><input id="password" type="password" autocomplete="current-password" placeholder="কমপক্ষে ৬ অক্ষর">
+    <div class="actions"><button id="loginBtn">লগইন</button><button class="secondary" id="registerBtn">নতুন অ্যাকাউন্ট</button></div>
+    <div class="actions"><button class="secondary" id="showSetup">Firebase সেটিংস</button></div>
+    <p id="authMsg" class="muted" role="status"></p>
+  </section>
+
+  <section id="appPanel" class="hidden">
+    <div class="topline">
+      <div><div class="tag">ব্যক্তিগত ভল্ট</div><h2 style="margin:7px 0 0">ড্যাশবোর্ড</h2><div id="signedInAs" class="muted"></div></div>
+      <button class="secondary" id="logoutBtn">লগআউট</button>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="stat" id="noteCount">০</div><div class="stat-label">সংরক্ষিত নোট</div></div>
+      <div class="card"><div class="stat">৩ মাস</div><div class="stat-label">নির্ধারিত Check-in সময়</div></div>
+    </div>
+    <div class="tabs">
+      <button class="active" data-tab="notes">আমার নোট</button>
+      <button data-tab="people">বিশ্বস্ত ব্যক্তি</button>
+      <button data-tab="checkin">Check-in</button>
+      <button data-tab="instructions">নির্দেশনা</button>
+    </div>
+
+    <section id="tab-notes" class="panel">
+      <h2 class="section-title">নতুন নোট / চিঠি</h2>
+      <label>শিরোনাম</label><input id="noteTitle" maxlength="120" placeholder="যেমন: পরিবারের জন্য চিঠি">
+      <label>নোটের বিষয়বস্তু</label><textarea id="noteBody" maxlength="12000" placeholder="এখানে আপনার নোট লিখুন..."></textarea>
+      <div class="actions"><button id="saveNote">নোট সংরক্ষণ</button></div>
+      <hr><h3>সংরক্ষিত নোট</h3><div id="notesList" class="muted">এখনো কোনো নোট নেই।</div>
+    </section>
+
+    <section id="tab-people" class="panel hidden">
+      <h2 class="section-title">বিশ্বস্ত ব্যক্তি / উত্তরাধিকারী</h2>
+      <p class="muted">যাদের সঙ্গে প্রয়োজনে যোগাযোগ করা হবে তাদের তথ্য রাখুন। এই সংস্করণে তাদের কাছে এখনো কোনো বার্তা পাঠানো হয় না।</p>
+      <label>নাম</label><input id="personName" maxlength="100">
+      <label>ইমেইল</label><input id="personEmail" type="email">
+      <label>মোবাইল নম্বর (দেশের কোডসহ)</label><input id="personPhone" type="tel" placeholder="+8801XXXXXXXXX">
+      <label>সম্পর্ক / পরিচয়</label><input id="personRelation" maxlength="80" placeholder="যেমন: ভাই, মেয়ে, বিশ্বস্ত বন্ধু">
+      <div class="actions"><button id="savePerson">ব্যক্তি সংরক্ষণ</button></div>
+      <hr><div id="peopleList" class="muted">এখনো কাউকে যোগ করা হয়নি।</div>
+    </section>
+
+    <section id="tab-checkin" class="panel hidden">
+      <h2 class="section-title">আমার Check-in</h2>
+      <p>আপনার নির্ধারিত Check-in সময় প্রতি ৩ মাসে একবার। নিচের বোতাম চাপলে আজকের উপস্থিতি Firestore-এ সংরক্ষিত হবে।</p>
+      <div class="item"><b>সর্বশেষ Check-in:</b> <span id="lastCheckin">এখনো করা হয়নি</span></div>
+      <button id="checkinBtn">আমি সক্রিয় আছি — Check-in করুন</button>
+      <p class="muted">এই প্রাথমিক HTML নিজে থেকে ৩ মাস পরে সতর্কবার্তা বা উত্তরাধিকারী যাচাই চালাবে না। তার জন্য নিরাপদ সার্ভার-সাইড scheduler ও যাচাই ব্যবস্থা পরবর্তী ধাপে যুক্ত করতে হবে।</p>
+    </section>
+
+    <section id="tab-instructions" class="panel hidden">
+      <h2 class="section-title">উত্তরাধিকার নির্দেশনা</h2>
+      <p>এখানে ভবিষ্যতে প্রতিটি নোট কোন ব্যক্তির কাছে যাবে, কোন বিশ্বস্ত ব্যক্তি যাচাই করবেন এবং কী প্রমাণ গ্রহণযোগ্য হবে—এসব নির্ধারণের সুবিধা যুক্ত হবে।</p>
+      <div class="item"><b>নির্ধারিত নীতি</b><p>প্রতি ৩ মাসে Check-in। Check-in মিস হলে প্রথমে মালিকের সঙ্গে যোগাযোগ; এরপর মনোনীত যাচাইকারীর মাধ্যমে দ্বিতীয় ধাপের নিশ্চিতকরণ।</p></div>
+      <p class="muted">শুধু দীর্ঘদিন Check-in না হওয়াকে মৃত্যু হিসেবে ধরা হবে না।</p>
+    </section>
+  </section>
+</main>
+<footer>My Digital Legacy · প্রাথমিক সংস্করণ · আপনার Firebase নিরাপত্তা Rules যাচাই না হওয়া পর্যন্ত সংবেদনশীল তথ্য সংরক্ষণ করবেন না।</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  let auth, db, currentUser;
+  let notes = [], people = [];
+  const configKey = 'mdl_firebase_config_v1';
+  // Firebase web-app configuration supplied by the site owner.
+  const defaultFirebaseConfig = {
+    apiKey: "AIzaSyB7Jmiyf29dtqhO7BxCMUN2fki8RJ1yHzM",
+    authDomain: "my-digital-legacy-a1283.firebaseapp.com",
+    projectId: "my-digital-legacy-a1283",
+    storageBucket: "my-digital-legacy-a1283.firebasestorage.app",
+    messagingSenderId: "196886284000",
+    appId: "1:196886284000:web:224371be56e81f3b78f285"
+  };
+  const bnDate = d => d ? new Date(d).toLocaleString('bn-BD',{dateStyle:'medium',timeStyle:'short'}) : 'এখনো করা হয়নি';
+  const msg = (el, text, bad=false) => { el.textContent=text; el.style.color=bad?'#a33b35':''; };
+
+  function getConfig(){
+    try { return JSON.parse(localStorage.getItem(configKey) || 'null') || defaultFirebaseConfig; }
+    catch { return defaultFirebaseConfig; }
+  }
+  function showSetup(){ $('setup').classList.remove('hidden'); const c=getConfig()||{}; $('cfgApi').value=c.apiKey||''; $('cfgAuth').value=c.authDomain||''; $('cfgProject').value=c.projectId||''; $('cfgApp').value=c.appId||''; }
+  function initFirebase(c){
+    if(!c || !c.apiKey || !c.authDomain || !c.projectId || !c.appId) return false;
+    try {
+      if(!firebase.apps.length) firebase.initializeApp(c);
+      auth=firebase.auth(); db=firebase.firestore();
+      auth.onAuthStateChanged(async user=>{
+        currentUser=user;
+        $('authPanel').classList.toggle('hidden',!!user);
+        $('appPanel').classList.toggle('hidden',!user);
+        if(user){$('signedInAs').textContent=user.email||''; await loadData();}
+      });
+      return true;
+    } catch(e){ msg($('authMsg'),'Firebase সংযোগে সমস্যা: '+e.message,true); return false; }
+  }
+  $('showSetup').onclick=showSetup;
+  $('closeSetup').onclick=()=>$('setup').classList.add('hidden');
+  $('saveConfig').onclick=()=>{
+    const c={apiKey:$('cfgApi').value.trim(),authDomain:$('cfgAuth').value.trim(),projectId:$('cfgProject').value.trim(),storageBucket:defaultFirebaseConfig.storageBucket,messagingSenderId:defaultFirebaseConfig.messagingSenderId,appId:$('cfgApp').value.trim()};
+    if(Object.values(c).some(v=>!v)){alert('সব Firebase তথ্য পূরণ করুন।');return}
+    localStorage.setItem(configKey,JSON.stringify(c)); location.reload();
+  };
+  $('loginBtn').onclick=async()=>{
+    try{ if(!auth) throw Error('আগে Firebase সেটিংস যোগ করুন।'); await auth.signInWithEmailAndPassword($('email').value.trim(),$('password').value); msg($('authMsg'),'লগইন সফল।');}
+    catch(e){msg($('authMsg'),e.message,true)}
+  };
+  $('registerBtn').onclick=async()=>{
+    try{if(!auth) throw Error('আগে Firebase সেটিংস যোগ করুন।'); await auth.createUserWithEmailAndPassword($('email').value.trim(),$('password').value); msg($('authMsg'),'অ্যাকাউন্ট তৈরি হয়েছে।');}
+    catch(e){msg($('authMsg'),e.message,true)}
+  };
+  $('logoutBtn').onclick=()=>auth.signOut();
+  function userCol(name){return db.collection('users').doc(currentUser.uid).collection(name)}
+  async function loadData(){
+    try{
+      const [n,p,c]=await Promise.all([userCol('notes').orderBy('createdAt','desc').get(),userCol('trustedPeople').orderBy('createdAt','desc').get(),userCol('settings').doc('checkin').get()]);
+      notes=n.docs.map(d=>({id:d.id,...d.data()})); people=p.docs.map(d=>({id:d.id,...d.data()}));
+      $('noteCount').textContent=String(notes.length).replace(/\d/g,d=>'০১২৩৪৫৬৭৮৯'[d]);
+      $('lastCheckin').textContent=c.exists?bnDate(c.data().lastCheckin?.toDate?.()):'এখনো করা হয়নি';
+      renderNotes(); renderPeople();
+    }catch(e){alert('ডেটা লোড হয়নি। Firestore Rules ও সংযোগ পরীক্ষা করুন: '+e.message)}
+  }
+  function renderNotes(){
+    const root=$('notesList'); root.innerHTML='';
+    if(!notes.length){root.textContent='এখনো কোনো নোট নেই।';return}
+    notes.forEach(n=>{
+      const div=document.createElement('div');div.className='item';
+      const h=document.createElement('h3');h.textContent=n.title||'শিরোনামহীন';
+      const p=document.createElement('p');p.textContent=n.body||'';
+      const small=document.createElement('div');small.className='muted';small.textContent=bnDate(n.createdAt?.toDate?.());
+      const del=document.createElement('button');del.className='danger';del.textContent='মুছুন';del.onclick=async()=>{if(confirm('এই নোটটি মুছবেন?')){await userCol('notes').doc(n.id).delete();await loadData()}};
+      div.append(h,small,p,del);root.append(div);
+    });
+  }
+  function renderPeople(){
+    const root=$('peopleList');root.innerHTML='';
+    if(!people.length){root.textContent='এখনো কাউকে যোগ করা হয়নি।';return}
+    people.forEach(p=>{
+      const div=document.createElement('div');div.className='item';
+      const h=document.createElement('h3');h.textContent=p.name;
+      const detail=document.createElement('p');detail.textContent=[p.relation,p.email,p.phone].filter(Boolean).join(' · ');
+      const del=document.createElement('button');del.className='danger';del.textContent='মুছুন';del.onclick=async()=>{if(confirm('এই ব্যক্তির তথ্য মুছবেন?')){await userCol('trustedPeople').doc(p.id).delete();await loadData()}};
+      div.append(h,detail,del);root.append(div);
+    });
+  }
+  $('saveNote').onclick=async()=>{
+    const title=$('noteTitle').value.trim(), body=$('noteBody').value.trim();
+    if(!title||!body){alert('শিরোনাম ও নোটের বিষয়বস্তু লিখুন।');return}
+    try{await userCol('notes').add({title,body,createdAt:firebase.firestore.FieldValue.serverTimestamp()});$('noteTitle').value='';$('noteBody').value='';await loadData()}
+    catch(e){alert('নোট সংরক্ষণ হয়নি: '+e.message)}
+  };
+  $('savePerson').onclick=async()=>{
+    const name=$('personName').value.trim(), email=$('personEmail').value.trim(), phone=$('personPhone').value.trim(), relation=$('personRelation').value.trim();
+    if(!name||(!email&&!phone)){alert('নাম এবং অন্তত ইমেইল অথবা মোবাইল নম্বর দিন।');return}
+    try{await userCol('trustedPeople').add({name,email,phone,relation,createdAt:firebase.firestore.FieldValue.serverTimestamp()});['personName','personEmail','personPhone','personRelation'].forEach(id=>$(id).value='');await loadData()}
+    catch(e){alert('তথ্য সংরক্ষণ হয়নি: '+e.message)}
+  };
+  $('checkinBtn').onclick=async()=>{
+    try{await userCol('settings').doc('checkin').set({lastCheckin:firebase.firestore.FieldValue.serverTimestamp(),intervalMonths:3},{merge:true});await loadData();alert('আপনার Check-in সংরক্ষিত হয়েছে।')}
+    catch(e){alert('Check-in সংরক্ষণ হয়নি: '+e.message)}
+  };
+  document.querySelectorAll('[data-tab]').forEach(btn=>btn.onclick=()=>{
+    document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b===btn));
+    ['notes','people','checkin','instructions'].forEach(t=>$('tab-'+t).classList.toggle('hidden',t!==btn.dataset.tab));
+  });
+  if(!getConfig()){showSetup()} else {initFirebase(getConfig())}
+})();
+</script>
+</body>
+</html>
